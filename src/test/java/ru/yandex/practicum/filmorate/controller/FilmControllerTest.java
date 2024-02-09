@@ -24,7 +24,7 @@ public class FilmControllerTest {
                 "  \"name\": \"nisi eiusmod\",\n" +
                 "  \"description\": \"adipisicing\",\n" +
                 "  \"releaseDate\": \"1967-03-25\",\n" +
-                "  \"duration\": 100\n" +
+                "  \"duration\": -100\n" +
                 "}";
 
         mvc.perform(MockMvcRequestBuilders.post("http://localhost:8080/films")
