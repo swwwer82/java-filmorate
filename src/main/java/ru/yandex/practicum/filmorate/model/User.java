@@ -26,6 +26,4 @@ public class User {
 
     @PastOrPresent(message = "день рождения не может быть в будующем")
     private LocalDate birthday;
-
-
 }
