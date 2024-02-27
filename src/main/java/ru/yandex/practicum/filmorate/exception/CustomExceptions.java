@@ -12,4 +12,16 @@ public class CustomExceptions {
             super(error);
         }
     }
+
+    public static class FilmDoesNotExistsException extends FilmException {
+        public FilmDoesNotExistsException(String error) {
+            super(error);
+        }
+    }
+
+    public static class UserDoesNotExistsException extends UserException {
+        public UserDoesNotExistsException(String error) {
+            super(error);
+        }
+    }
 }
