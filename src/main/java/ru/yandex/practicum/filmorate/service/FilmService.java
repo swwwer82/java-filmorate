@@ -12,6 +12,8 @@ import ru.yandex.practicum.filmorate.exception.CustomExceptions.FilmException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.util.FilmSequence;
+import ru.yandex.practicum.filmorate.util.UserSequence;
 
 @Service
 @Slf4j
@@ -33,7 +35,7 @@ public class FilmService {
     }
 
     public Film add(Film film) {
-        long id = filmStorage.getNextId();
+        long id = FilmSequence.getNextId();
 
         if (film.getId() == null) {
             film.setId(id);

@@ -11,7 +11,7 @@ import ru.yandex.practicum.filmorate.model.User;
 @Component
 @Slf4j
 public class InMemoryUserStorage implements UserStorage {
-    private static long id = 1;
+
     private final Map<Long, User> idToUser = new HashMap<>();
 
     @Override
@@ -42,8 +42,4 @@ public class InMemoryUserStorage implements UserStorage {
         return idToUser.get(id);
     }
 
-    @Override
-    public long getNextId() {
-        return id++;
-    }
 }

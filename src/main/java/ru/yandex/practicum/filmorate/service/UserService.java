@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.exception.CustomExceptions.UserDoesNotExist
 import ru.yandex.practicum.filmorate.exception.CustomExceptions.UserException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.util.UserSequence;
 
 @Service
 @Slf4j
@@ -23,7 +24,7 @@ public class UserService {
     }
 
     public User add(User user) {
-        long id = userStorage.getNextId();
+        long id = UserSequence.getNextId();
 
         if (user.getId() == null) {
             user.setId(id);

@@ -9,7 +9,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
-    private static long id = 1;
+
     private final Map<Long, Film> idToFilm = new HashMap<>();
 
     @Override
@@ -39,8 +39,4 @@ public class InMemoryFilmStorage implements FilmStorage {
         return idToFilm.get(id);
     }
 
-    @Override
-    public long getNextId() {
-        return id++;
-    }
 }
