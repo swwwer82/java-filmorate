@@ -83,6 +83,7 @@ class FilmControllerTest {
         mockMvc.perform(get("/films/9999"))
                 .andExpect(status().isNotFound());
     }
+
     @Test
     void shouldFindFilmById() throws Exception {
         mockMvc.perform(get("/films/1"))
