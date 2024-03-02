@@ -14,5 +14,4 @@ public interface UserStorage {
 
     User findById(Long id);
 
-    long getNextId();
 }

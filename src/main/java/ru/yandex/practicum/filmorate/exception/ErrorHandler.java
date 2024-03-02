@@ -19,12 +19,17 @@ class ErrorHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    ValidationErrorResponse getConstraintValidationException(ConstraintViolationException e) {
-        ValidationErrorResponse error = new ValidationErrorResponse();
+    ErrorResponseList getConstraintValidationException(ConstraintViolationException e) {
+        ErrorResponseList error = new ErrorResponseList();
         for (ConstraintViolation<?> violation : e.getConstraintViolations()) {
-            error.getValidationErrors().add(new ValidationError(violation.getPropertyPath().toString(), violation.getMessage()));
+            error
+                    .getErrorResponses()
+                    .add(new ErrorResponse(violation.getPropertyPath().toString(), violation.getMessage()));
 
-            log.error("Validation error: " + violation.getPropertyPath().toString() + ": " + violation.getMessage());
+            log.error(
+                    "ConstraintValidation error: {} - {}",
+                    violation.getPropertyPath().toString(),
+                    violation.getMessage());
         }
         return error;
     }
@@ -32,20 +37,37 @@ class ErrorHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    ValidationErrorResponse getMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        ValidationErrorResponse error = new ValidationErrorResponse();
+    ErrorResponseList getMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        ErrorResponseList error = new ErrorResponseList();
         for (FieldError fieldError : e.getBindingResult().getFieldErrors()) {
-            error.getValidationErrors().add(new ValidationError(fieldError.getField(), fieldError.getDefaultMessage()));
+            error
+                    .getErrorResponses()
+                    .add(new ErrorResponse(fieldError.getField(), fieldError.getDefaultMessage()));
 
-            log.error("Validation error: " + fieldError.getField() + ": " + fieldError.getDefaultMessage());
+            log.error(
+                    "MethodArgumentNotValid error: {} - {}",
+                    fieldError.getField(),
+                    fieldError.getDefaultMessage());
         }
         return error;
+    }
+
+    @ExceptionHandler({
+            CustomExceptions.UserDoesNotExistsException.class,
+            CustomExceptions.FilmDoesNotExistsException.class
+    })
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    ErrorResponse getModelException(RuntimeException e) {
+        log.error("Объект не найден: {}", e.getMessage());
+        return new ErrorResponse("Объект не найден", e.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    String getException(Exception e) {
-        return String.format("{\"error\": \"%s\"}", e.getMessage());
+    ErrorResponse getInternalException(Exception e) {
+        log.error("Внутренняя ошибка: {}", e.getMessage());
+        return new ErrorResponse("Внутренняя ошибка", e.getMessage());
     }
 }
