@@ -8,8 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = DEFINED_PORT)
@@ -79,5 +78,33 @@ class FilmControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    void shouldFindFilmByNotCorrectId() throws Exception {
+        mockMvc.perform(get("/films/9999"))
+                .andExpect(status().isNotFound());
+    }
+    @Test
+    void shouldFindFilmById() throws Exception {
+        mockMvc.perform(get("/films/1"))
+                .andExpect(status().isOk());
+    }
 
+    @Test
+    void shouldAddLikeToFilm() throws Exception {
+        // Assuming film with ID 1 and user ID 1 already exists
+        mockMvc.perform(put("/films/1/like/1"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldGetPopularFilms() throws Exception {
+        mockMvc.perform(get("/films/popular"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldDeleteLikeFromFilm() throws Exception {
+        mockMvc.perform(delete("/films/1/like/1"))
+                .andExpect(status().isOk());
+    }
 }
