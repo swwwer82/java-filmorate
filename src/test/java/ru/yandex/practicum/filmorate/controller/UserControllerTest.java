@@ -39,6 +39,16 @@ class UserControllerTest {
     }
 
     @Test
+    void shouldAddNewUserId3() throws Exception {
+        String json = "{\"name\":\"John Doas\",\"login\":\"johndoas\",\"email\":\"johnas@example.com\"}";
+
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     void shouldAddNewUserAsSomeId() throws Exception {
         String json = "{\"id\": 1,\"name\":\"John Doa\",\"login\":\"johndoa\",\"email\":\"johna@example.com\"}";
 
@@ -84,6 +94,13 @@ class UserControllerTest {
     @Test
     void shouldGetFriendsOfUser() throws Exception {
         mockMvc.perform(get("/users/1/friends"))
+                .andExpect(status().isOk());
+    }
+
+
+    @Test
+    void shouldGetMutualFriends() throws Exception {
+        mockMvc.perform(get("/users/1/friends/common/3"))
                 .andExpect(status().isOk());
     }
 
