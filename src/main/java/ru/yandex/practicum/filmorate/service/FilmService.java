@@ -1,124 +1,124 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.CustomExceptions.FilmDoesNotExistsException;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.CustomExceptions.FilmDoesNotExistsException;
-import ru.yandex.practicum.filmorate.exception.CustomExceptions.FilmException;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.util.FilmSequence;
 
 @Service
 @Slf4j
 public class FilmService {
-    private final FilmStorage filmStorage;
-    private final UserService userService;
+  private final FilmStorage filmStorage;
+  private final UserService userService;
 
-    @Autowired
-    public FilmService(FilmStorage filmStorage, UserService userService) {
-        this.filmStorage = filmStorage;
-        this.userService = userService;
+  @Autowired
+  public FilmService(@Qualifier("filmDBStorage") FilmStorage filmStorage, UserService userService) {
+    this.filmStorage = filmStorage;
+    this.userService = userService;
+  }
+
+  public List<Film> findAll() {
+    List<Film> films = filmStorage.findAll();
+    log.info("Возвращаем все фильмы. Общее количество: {}", films.size());
+
+    return films;
+  }
+
+  public Film add(Film film) {
+    if (film.getLikes() == null) {
+      film.setLikes(new HashSet<>());
     }
 
-    public List<Film> findAll() {
-        List<Film> films = filmStorage.findAll();
-        log.info("Возвращаем все фильмы. Общее количество: {}", films.size());
-
-        return films;
+    if (film.getGenres() == null) {
+      film.setGenres(new HashSet<>());
     }
 
-    public Film add(Film film) {
-        long id = FilmSequence.getNextId();
+    filmStorage.add(film);
+    log.info("Сохраняем новый фильм {}", film);
 
-        if (film.getId() == null) {
-            film.setId(id);
-        }
+    return film;
+  }
 
-        if (filmStorage.findById(film.getId()) != null) {
-            log.error("Фильм с id={} уже существует", film.getId());
-            throw new FilmException(String.format("Фильм с id=%s уже существует", film.getId()));
-        }
-
-        if (film.getLikes() == null) {
-            film.setLikes(new HashSet<>());
-        }
-
-        filmStorage.add(film);
-        log.info("Сохраняем новый фильм {}", film);
-
-        return film;
+  public Film update(Film film) {
+    if (filmStorage.findById(film.getId()) == null) {
+      log.error("Фильм с id={} не существует", film.getId());
+      throw new FilmDoesNotExistsException(
+          String.format("Фильм с id=%s не существует", film.getId()));
     }
 
-    public Film update(Film film) {
-        if (filmStorage.findById(film.getId()) == null) {
-            log.error("Фильм с id={} не существует", film.getId());
-            throw new FilmDoesNotExistsException(
-                    String.format("Фильм с id=%s не существует", film.getId()));
-        }
-
-        if (film.getLikes() == null) {
-            film.setLikes(new HashSet<>());
-        }
-
-        filmStorage.update(film);
-        log.info("Обновляем фильм {}", film);
-
-        return film;
+    if (film.getLikes() == null) {
+      film.setLikes(new HashSet<>());
     }
 
-    public Film findById(Long id) {
-        return getFilm(id);
-    }
+    filmStorage.update(film);
+    log.info("Обновляем фильм {}", film);
 
-    public void addLike(Long filmId, Long userId) {
-        User user = userService.getUser(userId);
-        Film film = getFilm(filmId);
+    return film;
+  }
 
-        film.getLikes().add(userId);
+  public Film findById(Long id) {
+    return getFilm(id);
+  }
 
-        log.info(
-                "Пользователю {}(id = {}) нравится фильм {}(id = {})",
-                user.getName(),
-                user.getId(),
-                film.getName(),
-                film.getId());
-    }
+  public void addLike(Long filmId, Long userId) {
+    User user = userService.getUser(userId);
+    Film film = getFilm(filmId);
 
-    private Film getFilm(Long filmId) {
-        Film film = filmStorage.findById(filmId);
+    film.getLikes().add(userId);
 
-        if (film == null)
-            throw new FilmDoesNotExistsException(String.format("Фильм с id=%s не существует", filmId));
+    update(film);
 
-        return film;
-    }
+    log.info(
+        "Пользователю {}(id = {}) нравится фильм {}(id = {})",
+        user.getName(),
+        user.getId(),
+        film.getName(),
+        film.getId());
+  }
 
-    public void deleteLike(Long filmId, Long userId) {
-        User user = userService.getUser(userId);
-        Film film = getFilm(filmId);
+  private Film getFilm(Long filmId) {
+    Film film = filmStorage.findById(filmId);
 
-        film.getLikes().remove(userId);
+    if (film == null)
+      throw new FilmDoesNotExistsException(String.format("Фильм с id=%s не существует", filmId));
 
-        log.info(
-                "Пользователю {}(id = {}) больше не нравится фильм {}(id = {})",
-                user.getName(),
-                user.getId(),
-                film.getName(),
-                film.getId());
-    }
+    return film;
+  }
 
-    public List<Film> getPopular(String filmsCount) {
-        long count = Long.parseLong(filmsCount);
+  public void deleteLike(Long filmId, Long userId) {
+    User user = userService.getUser(userId);
+    Film film = getFilm(filmId);
 
-        Comparator<Film> comparator =
-                Comparator.comparing(x -> x.getLikes().size(), Comparator.reverseOrder());
+    film.getLikes().remove(userId);
 
-        return filmStorage.findAll().stream().sorted(comparator).limit(count).collect(Collectors.toList());
-    }
+    update(film);
+
+    log.info(
+        "Пользователю {}(id = {}) больше не нравится фильм {}(id = {})",
+        user.getName(),
+        user.getId(),
+        film.getName(),
+        film.getId());
+  }
+
+  public List<Film> getPopular(String filmsCount) {
+    long count = Long.parseLong(filmsCount);
+
+    Comparator<Film> comparator =
+        Comparator.comparing(x -> x.getLikes().size(), Comparator.reverseOrder());
+
+    return filmStorage.findAll().stream()
+        .sorted(comparator)
+        .limit(count)
+        .collect(Collectors.toList());
+  }
 }

@@ -16,4 +16,3 @@ public @interface ValidReleaseDate {
 
     Class[] payload() default {};
 }
-
