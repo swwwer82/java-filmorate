@@ -6,5 +6,4 @@ public class FilmSequence {
     public static long getNextId() {
         return id++;
     }
-
 }
