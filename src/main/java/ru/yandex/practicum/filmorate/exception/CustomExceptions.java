@@ -32,7 +32,7 @@ public class CustomExceptions {
     }
 
     public static class GenreDoesNotExistsException  extends UserException {
-        public GenreDoesNotExistsException (String error) {
+        public GenreDoesNotExistsException(String error) {
             super(error);
         }
     }
