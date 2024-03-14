@@ -24,4 +24,17 @@ public class CustomExceptions {
             super(error);
         }
     }
+
+    public static class MpaDoesNotExistsException extends UserException {
+        public MpaDoesNotExistsException(String error) {
+            super(error);
+        }
+    }
+
+    public static class GenreDoesNotExistsException  extends UserException {
+        public GenreDoesNotExistsException (String error) {
+            super(error);
+        }
+    }
+
 }
