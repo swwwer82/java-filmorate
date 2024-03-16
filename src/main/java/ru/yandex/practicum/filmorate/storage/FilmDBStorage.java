@@ -1,9 +1,8 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -193,16 +192,14 @@ public class FilmDBStorage implements FilmStorage {
     }
   }
 
-  @Getter
-  @Setter
+  @Data
   @AllArgsConstructor
   private static class FilmLike {
     Long filmId;
     Long userId;
   }
 
-  @Getter
-  @Setter
+  @Data
   @AllArgsConstructor
   private static class FilmGenre {
     Long filmId;
