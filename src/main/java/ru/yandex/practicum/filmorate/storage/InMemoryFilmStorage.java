@@ -11,6 +11,7 @@ import java.util.Map;
 @Component("inMemoryFilmStorage")
 public class InMemoryFilmStorage implements FilmStorage {
 
+  private static final long id = 1;
   private final Map<Long, Film> idToFilm = new HashMap<>();
 
   @Override
