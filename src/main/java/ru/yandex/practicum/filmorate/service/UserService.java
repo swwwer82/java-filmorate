@@ -66,13 +66,8 @@ public class UserService {
   public void addFriend(Long userId, Long friendId) {
     User user = getUser(userId);
     User friend = getUser(friendId);
-
     user.getFriends().add(friendId);
-//    friend.getFriends().add(userId);
-
     userStorage.update(user);
-//    userStorage.update(friend);
-
     log.info(
         "Пользователи {}(id={}) и {}(id={}) теперь друзья",
         user.getName(),
